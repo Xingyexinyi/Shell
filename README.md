@@ -96,5 +96,3 @@ Hello, World!
 myshell> cat < output.txt | grep Hello
 Hello, World!
 ```
-
-希望这份 README 能够帮助用户了解和使用这个 Shell 程序。如果有其他需求或问题，请随时补充说明。
