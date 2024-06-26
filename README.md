@@ -1,4 +1,3 @@
-
 # MyShell
 
 MyShell 是一个用 C++ 实现的简单 Linux Shell 程序，支持命令输入、执行和显示执行结果的功能。该 Shell 还支持脚本编程、I/O 重定向和管道功能。
@@ -12,8 +11,9 @@ MyShell 是一个用 C++ 实现的简单 Linux Shell 程序，支持命令输入
 ## 文件结构
 
 - `main.cpp`：主程序文件，包含主函数，负责启动 Shell 或执行脚本。
-- `shell.h`：头文件，包含辅助功能的声明和必要的包含指令。
-- `shell.cpp`：实现头文件中声明的函数，负责命令解析、执行和 Shell 逻辑。
+- `Shell.h` 和 `Shell.cpp`：Shell 类，负责处理 Shell 的运行逻辑和脚本执行。
+- `CommandParser.h` 和 `CommandParser.cpp`：CommandParser 类，负责解析用户输入的命令。
+- `CommandExecutor.h` 和 `CommandExecutor.cpp`：CommandExecutor 类，负责执行解析后的命令，并处理 I/O 重定向和管道。
 
 ## 编译和运行
 
@@ -22,7 +22,7 @@ MyShell 是一个用 C++ 实现的简单 Linux Shell 程序，支持命令输入
 确保所有文件都在同一个目录下，然后使用以下命令编译程序：
 
 ```sh
-g++ -o myshell main.cpp shell.cpp
+g++ -o myshell main.cpp Shell.cpp CommandParser.cpp CommandExecutor.cpp
 ```
 
 ### 运行
@@ -96,3 +96,5 @@ Hello, World!
 myshell> cat < output.txt | grep Hello
 Hello, World!
 ```
+
+希望这份 README 能够帮助用户了解和使用这个 Shell 程序。如果有其他需求或问题，请随时补充说明。
