@@ -9,6 +9,10 @@ target_sources( shell
         main.cpp
         shell.cpp
         shell.h
+        commandparser.cpp
+        commandparser.h
+        commandexecutor.cpp
+        commandexecutor.h
         
     PUBLIC
         

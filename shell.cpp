@@ -1,60 +1,17 @@
-//author ranleixin 2024-6-20
-// shell.cpp
+// Shell.cpp
 
 #include "shell.h"
-#include <iostream>
 #include <sstream>
+#include <iostream>
+#include <fstream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <fstream>
 
-void execute_command(const std::vector<std::string>& args, bool background, int input_fd, int output_fd) {
-    pid_t pid = fork();
+Shell::Shell() {}
 
-    if (pid == 0) {
-        // 子进程
-        if (input_fd != -1) {
-            dup2(input_fd, STDIN_FILENO);
-            close(input_fd);
-        }
-        if (output_fd != -1) {
-            dup2(output_fd, STDOUT_FILENO);
-            close(output_fd);
-        }
-
-        std::vector<char*> cargs;
-        for (const auto& arg : args) {
-            cargs.push_back(const_cast<char*>(arg.c_str()));
-        }
-        cargs.push_back(nullptr);
-
-        execvp(cargs[0], cargs.data());
-        perror("execvp failed");
-        exit(EXIT_FAILURE);
-    } else if (pid > 0) {
-        // 父进程
-        if (!background) {
-            int status;
-            waitpid(pid, &status, 0);
-        }
-    } else {
-        perror("fork failed");
-    }
-}
-
-std::vector<std::string> parse_command(const std::string& input) {
-    std::istringstream iss(input);
-    std::vector<std::string> tokens;
-    std::string token;
-    while (iss >> token) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
-void run_shell() {
+void Shell::run() {
     std::string input;
 
     while (true) {
@@ -67,7 +24,7 @@ void run_shell() {
             continue;
         }
 
-        auto commands = parse_command(input);
+        auto commands = parser.parse_command(input);
 
         // 处理退出命令
         if (commands[0] == "exit") {
@@ -105,7 +62,7 @@ void run_shell() {
                     return;
                 }
 
-                execute_command(command, false, input_fd, pipefd[1]);
+                executor.execute_command(command, false, input_fd, pipefd[1]);
                 close(pipefd[1]);
                 if (input_fd != -1) close(input_fd);
                 command.clear();
@@ -118,14 +75,14 @@ void run_shell() {
         }
 
         if (!command.empty()) {
-            execute_command(command, background, input_fd, output_fd);
+            executor.execute_command(command, background, input_fd, output_fd);
             if (input_fd != -1) close(input_fd);
             if (output_fd != -1) close(output_fd);
         }
     }
 }
 
-void execute_script(const std::string& script_filename) {
+void Shell::execute_script(const std::string& script_filename) {
     std::ifstream script_file(script_filename);
     if (!script_file) {
         std::cerr << "Unable to open script file: " << script_filename << std::endl;
@@ -134,7 +91,7 @@ void execute_script(const std::string& script_filename) {
 
     std::string line;
     while (std::getline(script_file, line)) {
-        auto commands = parse_command(line);
-        execute_command(commands);
+        auto commands = parser.parse_command(line);
+        executor.execute_command(commands);
     }
 }
